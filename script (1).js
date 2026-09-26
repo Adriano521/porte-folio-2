@@ -1,22 +1,40 @@
-// ========================================
-// PORTFOLIO — JAVASCRIPT
-// ========================================
+/* =========================================================
+   PORTFOLIO - JAVASCRIPT
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ========================================
-  // 1. SCROLL FLUIDE
-  // ========================================
+  /* =======================================================
+     NAVBAR AU SCROLL
+  ======================================================= */
 
-  const internalLinks = document.querySelectorAll('a[href^="#"]');
+  const navbar = document.querySelector(".navbar");
 
-  internalLinks.forEach((link) => {
+  function updateNavbar() {
+    if (window.scrollY > 40) {
+      navbar.classList.add("scrolled");
+    } else {
+      navbar.classList.remove("scrolled");
+    }
+  }
 
-    link.addEventListener("click", (event) => {
+  window.addEventListener("scroll", updateNavbar);
+
+  updateNavbar();
+
+
+  /* =======================================================
+     SCROLL FLUIDE
+  ======================================================= */
+
+  const links = document.querySelectorAll('a[href^="#"]');
+
+  links.forEach(link => {
+
+    link.addEventListener("click", event => {
 
       const targetId = link.getAttribute("href");
 
-      // Ignore les liens "#"
       if (!targetId || targetId === "#") {
         return;
       }
@@ -29,9 +47,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       event.preventDefault();
 
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+      const navbarHeight = navbar.offsetHeight;
+
+      const targetPosition =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        navbarHeight -
+        20;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth"
       });
 
     });
@@ -39,159 +65,91 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-  // ========================================
-  // 2. NAVBAR AU SCROLL
-  // ========================================
+  /* =======================================================
+     APPARITION DES SECTIONS
+  ======================================================= */
 
-  const header = document.querySelector(".header");
+  const revealElements = document.querySelectorAll(
+    ".section-title, .formation-card, .experience, .skill-card, .contact-section"
+  );
 
-  const updateHeader = () => {
+  revealElements.forEach(element => {
+    element.classList.add("reveal");
+  });
 
-    if (!header) {
-      return;
+
+  const observer = new IntersectionObserver(
+    entries => {
+
+      entries.forEach(entry => {
+
+        if (entry.isIntersecting) {
+
+          entry.target.classList.add("visible");
+
+          observer.unobserve(entry.target);
+
+        }
+
+      });
+
+    },
+    {
+      threshold: 0.12
     }
-
-    if (window.scrollY > 50) {
-      header.classList.add("scrolled");
-    } else {
-      header.classList.remove("scrolled");
-    }
-
-  };
-
-  window.addEventListener("scroll", updateHeader);
-
-  updateHeader();
-
-
-  // ========================================
-  // 3. ANIMATION DES ÉLÉMENTS
-  // ========================================
-
-  const animatedElements = document.querySelectorAll(
-    ".skill-card, .project-card, .about-content, .section-heading"
   );
 
 
-  // Vérifie si l'utilisateur préfère
-  // réduire les animations.
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
+  revealElements.forEach(element => {
+    observer.observe(element);
+  });
 
 
-  if (!prefersReducedMotion && "IntersectionObserver" in window) {
+  /* =======================================================
+     ANIMATION DES COMPETENCES
+  ======================================================= */
 
-    const observer = new IntersectionObserver(
-      (entries, observer) => {
+  const skillCards = document.querySelectorAll(".skill-card");
 
-        entries.forEach((entry) => {
+  skillCards.forEach((card, index) => {
 
-          if (entry.isIntersecting) {
+    card.style.transitionDelay = `${index * 70}ms`;
 
-            entry.target.classList.add("visible");
+    card.addEventListener("mouseenter", () => {
 
-            observer.unobserve(entry.target);
+      skillCards.forEach(otherCard => {
 
-          }
+        if (otherCard !== card) {
+          otherCard.style.opacity = "0.55";
+        }
 
-        });
+      });
 
-      },
-      {
-        threshold: 0.15
-      }
-    );
-
-
-    animatedElements.forEach((element) => {
-      element.classList.add("reveal");
-      observer.observe(element);
     });
 
-  } else {
 
-    // Si les animations sont désactivées,
-    // on affiche directement les éléments.
-    animatedElements.forEach((element) => {
-      element.classList.add("visible");
-    });
+    card.addEventListener("mouseleave", () => {
 
-  }
+      skillCards.forEach(otherCard => {
+        otherCard.style.opacity = "1";
+      });
 
-
-  // ========================================
-  // 4. BOUTON "RETOUR EN HAUT"
-  // ========================================
-
-  const backToTop = document.createElement("button");
-
-  backToTop.className = "back-to-top";
-  backToTop.setAttribute("aria-label", "Retour en haut");
-  backToTop.innerHTML = "↑";
-
-  document.body.appendChild(backToTop);
-
-
-  const updateBackToTop = () => {
-
-    if (window.scrollY > 500) {
-      backToTop.classList.add("show");
-    } else {
-      backToTop.classList.remove("show");
-    }
-
-  };
-
-
-  window.addEventListener("scroll", updateBackToTop);
-
-  updateBackToTop();
-
-
-  backToTop.addEventListener("click", () => {
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
     });
 
   });
 
 
-  // ========================================
-  // 5. ANIMATION DU BOUTON PRINCIPAL
-  // ========================================
+  /* =======================================================
+     EFFET PARALLAXE PHOTO
+  ======================================================= */
 
-  const buttons = document.querySelectorAll(".button");
+  const profile = document.querySelector(".profile-wrapper");
 
-  buttons.forEach((button) => {
+  if (profile && window.matchMedia("(pointer:fine)").matches) {
 
-    button.addEventListener("mouseenter", () => {
-      button.classList.add("button-hover");
-    });
+    profile.addEventListener("mousemove", event => {
 
-    button.addEventListener("mouseleave", () => {
-      button.classList.remove("button-hover");
-    });
-
-  });
-
-
-  // ========================================
-  // 6. EFFET PARALLAXE LÉGER SUR LA PHOTO
-  // ========================================
-
-  const heroVisual = document.querySelector(".hero-visual");
-
-  if (
-    heroVisual &&
-    !prefersReducedMotion
-  ) {
-
-    heroVisual.addEventListener("mousemove", (event) => {
-
-      const rect = heroVisual.getBoundingClientRect();
+      const rect = profile.getBoundingClientRect();
 
       const x =
         (event.clientX - rect.left) / rect.width - 0.5;
@@ -199,20 +157,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const y =
         (event.clientY - rect.top) / rect.height - 0.5;
 
-
-      heroVisual.style.transform = `
-        perspective(1000px)
-        rotateY(${x * 4}deg)
-        rotateX(${-y * 4}deg)
+      profile.style.transform = `
+        perspective(800px)
+        rotateY(${x * 5}deg)
+        rotateX(${y * -5}deg)
       `;
 
     });
 
 
-    heroVisual.addEventListener("mouseleave", () => {
+    profile.addEventListener("mouseleave", () => {
 
-      heroVisual.style.transform = `
-        perspective(1000px)
+      profile.style.transform = `
+        perspective(800px)
         rotateY(0deg)
         rotateX(0deg)
       `;
@@ -222,14 +179,79 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // ========================================
-  // 7. ANNÉE AUTOMATIQUE DU FOOTER
-  // ========================================
+  /* =======================================================
+     EXPERIENCE CARDS
+  ======================================================= */
 
-  const footerYear = document.querySelector(".footer-year");
+  const experiences =
+    document.querySelectorAll(".experience-card");
 
-  if (footerYear) {
-    footerYear.textContent = new Date().getFullYear();
+  experiences.forEach(card => {
+
+    card.addEventListener("mouseenter", () => {
+
+      card.style.zIndex = "5";
+
+    });
+
+    card.addEventListener("mouseleave", () => {
+
+      card.style.zIndex = "1";
+
+    });
+
+  });
+
+
+  /* =======================================================
+     EFFET CURSEUR SUR LES BOUTONS
+  ======================================================= */
+
+  const buttons = document.querySelectorAll(
+    ".primary-btn, .secondary-btn, .contact-btn"
+  );
+
+  buttons.forEach(button => {
+
+    button.addEventListener("mousemove", event => {
+
+      const rect = button.getBoundingClientRect();
+
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      button.style.setProperty("--mouse-x", `${x}px`);
+      button.style.setProperty("--mouse-y", `${y}px`);
+
+    });
+
+  });
+
+
+  /* =======================================================
+     ANNEE AUTOMATIQUE DU FOOTER
+  ======================================================= */
+
+  const footer = document.querySelector("footer");
+
+  if (footer) {
+
+    const year = new Date().getFullYear();
+
+    footer.innerHTML = footer.innerHTML.replace(
+      /©\s*\d{4}/,
+      `© ${year}`
+    );
+
   }
+
+
+  /* =======================================================
+     CONSOLE
+  ======================================================= */
+
+  console.log(
+    "Portfolio Adriano Buisine-Fanesi — site chargé."
+  );
 
 });
