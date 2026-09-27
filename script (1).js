@@ -1,257 +1,130 @@
-/* =========================================================
-   PORTFOLIO - JAVASCRIPT
-========================================================= */
+const menuBtn = document.getElementById("menuBtn");
+const nav = document.getElementById("navMenu");
+const progress = document.getElementById("progress");
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  /* =======================================================
-     NAVBAR AU SCROLL
-  ======================================================= */
-
-  const navbar = document.querySelector(".navbar");
-
-  function updateNavbar() {
-    if (window.scrollY > 40) {
-      navbar.classList.add("scrolled");
-    } else {
-      navbar.classList.remove("scrolled");
-    }
-  }
-
-  window.addEventListener("scroll", updateNavbar);
-
-  updateNavbar();
+menuBtn.addEventListener("click", () => {
+  nav.classList.toggle("open");
+});
 
 
-  /* =======================================================
-     SCROLL FLUIDE
-  ======================================================= */
+document.querySelectorAll("#navMenu a").forEach(link => {
+  link.addEventListener("click", () => {
+    nav.classList.remove("open");
+  });
+});
 
-  const links = document.querySelectorAll('a[href^="#"]');
 
-  links.forEach(link => {
-
-    link.addEventListener("click", event => {
-
-      const targetId = link.getAttribute("href");
-
-      if (!targetId || targetId === "#") {
-        return;
+const reveal = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        reveal.unobserve(entry.target);
       }
-
-      const target = document.querySelector(targetId);
-
-      if (!target) {
-        return;
-      }
-
-      event.preventDefault();
-
-      const navbarHeight = navbar.offsetHeight;
-
-      const targetPosition =
-        target.getBoundingClientRect().top +
-        window.scrollY -
-        navbarHeight -
-        20;
-
-      window.scrollTo({
-        top: targetPosition,
-        behavior: "smooth"
-      });
-
     });
+  },
+  { threshold: 0.12 }
+);
 
-  });
+document
+  .querySelectorAll(".reveal")
+  .forEach(element => reveal.observe(element));
 
 
-  /* =======================================================
-     APPARITION DES SECTIONS
-  ======================================================= */
+document.querySelectorAll(".skill").forEach(skill => {
 
-  const revealElements = document.querySelectorAll(
-    ".section-title, .formation-card, .experience, .skill-card, .contact-section"
-  );
+  skill.addEventListener("click", () => {
 
-  revealElements.forEach(element => {
-    element.classList.add("reveal");
-  });
+    const open = skill.classList.toggle("open");
 
-
-  const observer = new IntersectionObserver(
-    entries => {
-
-      entries.forEach(entry => {
-
-        if (entry.isIntersecting) {
-
-          entry.target.classList.add("visible");
-
-          observer.unobserve(entry.target);
-
-        }
-
-      });
-
-    },
-    {
-      threshold: 0.12
-    }
-  );
-
-
-  revealElements.forEach(element => {
-    observer.observe(element);
-  });
-
-
-  /* =======================================================
-     ANIMATION DES COMPETENCES
-  ======================================================= */
-
-  const skillCards = document.querySelectorAll(".skill-card");
-
-  skillCards.forEach((card, index) => {
-
-    card.style.transitionDelay = `${index * 70}ms`;
-
-    card.addEventListener("mouseenter", () => {
-
-      skillCards.forEach(otherCard => {
-
-        if (otherCard !== card) {
-          otherCard.style.opacity = "0.55";
-        }
-
-      });
-
-    });
-
-
-    card.addEventListener("mouseleave", () => {
-
-      skillCards.forEach(otherCard => {
-        otherCard.style.opacity = "1";
-      });
-
-    });
-
-  });
-
-
-  /* =======================================================
-     EFFET PARALLAXE PHOTO
-  ======================================================= */
-
-  const profile = document.querySelector(".profile-wrapper");
-
-  if (profile && window.matchMedia("(pointer:fine)").matches) {
-
-    profile.addEventListener("mousemove", event => {
-
-      const rect = profile.getBoundingClientRect();
-
-      const x =
-        (event.clientX - rect.left) / rect.width - 0.5;
-
-      const y =
-        (event.clientY - rect.top) / rect.height - 0.5;
-
-      profile.style.transform = `
-        perspective(800px)
-        rotateY(${x * 5}deg)
-        rotateX(${y * -5}deg)
-      `;
-
-    });
-
-
-    profile.addEventListener("mouseleave", () => {
-
-      profile.style.transform = `
-        perspective(800px)
-        rotateY(0deg)
-        rotateX(0deg)
-      `;
-
-    });
-
-  }
-
-
-  /* =======================================================
-     EXPERIENCE CARDS
-  ======================================================= */
-
-  const experiences =
-    document.querySelectorAll(".experience-card");
-
-  experiences.forEach(card => {
-
-    card.addEventListener("mouseenter", () => {
-
-      card.style.zIndex = "5";
-
-    });
-
-    card.addEventListener("mouseleave", () => {
-
-      card.style.zIndex = "1";
-
-    });
-
-  });
-
-
-  /* =======================================================
-     EFFET CURSEUR SUR LES BOUTONS
-  ======================================================= */
-
-  const buttons = document.querySelectorAll(
-    ".primary-btn, .secondary-btn, .contact-btn"
-  );
-
-  buttons.forEach(button => {
-
-    button.addEventListener("mousemove", event => {
-
-      const rect = button.getBoundingClientRect();
-
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      button.style.setProperty("--mouse-x", `${x}px`);
-      button.style.setProperty("--mouse-y", `${y}px`);
-
-    });
-
-  });
-
-
-  /* =======================================================
-     ANNEE AUTOMATIQUE DU FOOTER
-  ======================================================= */
-
-  const footer = document.querySelector("footer");
-
-  if (footer) {
-
-    const year = new Date().getFullYear();
-
-    footer.innerHTML = footer.innerHTML.replace(
-      /©\s*\d{4}/,
-      `© ${year}`
+    skill.setAttribute(
+      "aria-expanded",
+      open
     );
 
-  }
+    skill.querySelector("b").textContent =
+      open ? "−" : "+";
 
-
-  /* =======================================================
-     CONSOLE
-  ======================================================= */
-
-  console.log(
-    "Portfolio Adriano Buisine-Fanesi — site chargé."
-  );
+  });
 
 });
+
+
+const sections =
+  document.querySelectorAll("main section[id]");
+
+const links =
+  document.querySelectorAll("nav a[href^='#']");
+
+
+const activeSection = new IntersectionObserver(
+  entries => {
+
+    entries.forEach(entry => {
+
+      if (entry.isIntersecting) {
+
+        links.forEach(link => {
+
+          link.classList.toggle(
+            "active",
+            link.getAttribute("href") ===
+            `#${entry.target.id}`
+          );
+
+        });
+
+      }
+
+    });
+
+  },
+  {
+    rootMargin: "-40% 0px -50% 0px"
+  }
+);
+
+
+sections.forEach(section => {
+  activeSection.observe(section);
+});
+
+
+window.addEventListener("scroll", () => {
+
+  const max =
+    document.documentElement.scrollHeight -
+    window.innerHeight;
+
+  progress.style.width =
+    `${max ? (window.scrollY / max) * 100 : 0}%`;
+
+});
+
+
+document
+  .getElementById("copyEmail")
+  .addEventListener("click", async () => {
+
+    await navigator.clipboard.writeText(
+      "adriano.buisine@gmail.com"
+    );
+
+    const button =
+      document.getElementById("copyEmail");
+
+    const oldText =
+      button.textContent;
+
+    button.textContent =
+      "Adresse copiée ✓";
+
+    setTimeout(() => {
+      button.textContent = oldText;
+    }, 1800);
+
+  });
+
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
